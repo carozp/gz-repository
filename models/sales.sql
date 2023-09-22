@@ -1,25 +1,25 @@
 {{ config(schema='transaction') }}
 
 WITH 
+----sales AS (SELECT * FROM `gz_raw_data.raw_gz_sales`)---
+   sales AS (SELECT * FROM {{ ref('stg_sales') }} )
 
-  sales AS (SELECT * FROM `gz_raw_data.raw_gz_sales`)
-
-  ,product AS (SELECT * FROM `gz_raw_data.raw_gz_product`)
+  ,product AS (SELECT * FROM {{ ref('stg_product') }})
 
 SELECT
   s.date_date
   ### Key ###
   ,s.orders_id
-  ,s.pdt_id AS products_id
+  ,s.products_id
   ###########
 	-- qty --
-	,s.quantity AS qty
+	,s.qty
   -- revenue --
-  ,s.revenue AS turnover
+  ,s.turnover
   -- cost --
-  ,CAST(p.purchSE_PRICE AS FLOAT64) AS purchase_price
-	,ROUND(s.quantity*CAST(p.purchSE_PRICE AS FLOAT64),2) AS purchase_cost
+  ,purchase_price
+	,ROUND(s.qty*purchase_price,2) AS purchase_cost
 	-- margin --
-	,s.revenue - s.quantity*CAST(p.purchSE_PRICE AS FLOAT64) AS margin
+	,s.turnover - s.qty*purchase_price AS margin
 FROM sales s
-INNER JOIN product p ON s.pdt_id = p.products_id
+INNER JOIN product p ON s.products_id = p.products_id
