@@ -32,3 +32,16 @@ models:
 
           - name: margin
             description: ganancias-costos
+
+    - name: orders
+      description: ordenes de compra con detalles de costos y ganancias
+      tests:
+        - unique:
+            column_name: orders_id
+            
+      columns:
+          - name: orders_id
+            description: PK-identificador de ordenes
+            tests : 
+            - not_null 
+         
